@@ -31,7 +31,7 @@ class DBConnection {
     }
     
     func uploadSession(logFileURL: String?, videoURL: String?) {
-         
+        
         guard let session = Session.current else {
             print("No session initialized")
             return
@@ -47,8 +47,8 @@ class DBConnection {
         
         //TODO: use codable class
         
-        return try? firestoreDB.collection("applications").document(AzboukiClientConfig.instance.appId).collection("screenshots").addDocument(data: ["createdAt": Date().timeIntervalSince1970*1000, "tree": tree.asJsonString(), "message": message, "userId": AzboukiClientConfig.instance.userId, "deviceModel": UIDevice.current.model, "os": UIDevice.current.systemName, "osVersion": UIDevice.current.systemVersion, "batteryLevel": UIDevice.current.batteryLevel], completion: { error in
-            print(error)
+        return firestoreDB.collection("applications").document(AzboukiClientConfig.instance.appId).collection("screenshots").addDocument(data: ["createdAt": Date().timeIntervalSince1970*1000, "tree": tree.asJsonString(), "message": message, "userId": AzboukiClientConfig.instance.userId!, "deviceModel": UIDevice.current.model, "os": UIDevice.current.systemName, "osVersion": UIDevice.current.systemVersion, "batteryLevel": UIDevice.current.batteryLevel], completion: { error in
+            print(error as Any)
         })
         
     }
@@ -57,7 +57,7 @@ class DBConnection {
         let metadata = StorageMetadata()
         metadata.contentType = "video"
         ref.putData(data, metadata: metadata) { (metadata, error) in
-            let size = metadata!.size
+//            let size = metadata!.size
           ref.downloadURL { (url, error) in
             completion(url?.absoluteString)
           }
@@ -73,7 +73,6 @@ class DBConnection {
         }
     }
     func uploadScreenshot(data: Data, completion: @escaping (String?) -> Void) {
-        guard let sessionID = sessionID else { return }
         let imageRef = storageRef.child("shots/\(UUID().uuidString).jpg")
         upload(ref: imageRef, data: data) { (url) in
             completion(url)
@@ -81,7 +80,6 @@ class DBConnection {
     }
     
     func uploadHierarchyImage(name: String, screenshotId: String, data: Data, completion: @escaping (String?) -> Void) {
-        guard let sessionID = sessionID else { return }
         let imageRef = storageRef.child("screenshots/\(screenshotId)/\(name)")
         upload(ref: imageRef, data: data) { (url) in
             completion(url)
