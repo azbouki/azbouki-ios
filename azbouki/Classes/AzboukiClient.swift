@@ -9,10 +9,11 @@ import UIKit
 import FirebaseCore
 import Sentry
 import ReplayKit
+import FirebaseAuth
 
 public class AzboukiClient {
     
-    static let shared = AzboukiClient()
+    public static let shared = AzboukiClient()
     var currentSessionID = "\(Int(Date().timeIntervalSince1970*1000))"
     var dbConnection: DBConnection?
     var inputPipe: Pipe?
@@ -36,12 +37,13 @@ public class AzboukiClient {
     
     public static func configure(appId: String, userId: String?) {
         shared.configure(appId: appId, userId: userId, googleAppID: Constants.GOOGLE_APP_ID, gcmSenderID: Constants.GCM_SENDER_ID, apiKey: Constants.FB_API_KEY, projectID: Constants.FB_PROJECT_ID, clientID: Constants.FB_CLIENT_ID, storageBucket: Constants.FB_STORAGE_BUCKET, databaseURL: Constants.DATABASE_URL)
+        
     }
     
-    func setScreenshotHandlerEnabled(_ enabled: Bool, message: String) {
+    public func setScreenshotHandlerEnabled(_ enabled: Bool, message: String) {
         if (enabled) {
             NotificationCenter.default.addObserver(
-                forName: NSNotification.Name.UIApplicationUserDidTakeScreenshot,
+                forName: UIApplication.userDidTakeScreenshotNotification,
                 object: nil,
                 queue: .main) { notification in
                     if var topController = UIApplication.shared.keyWindow?.rootViewController {
@@ -54,7 +56,7 @@ public class AzboukiClient {
                     
             }
         } else {
-            NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIApplicationUserDidTakeScreenshot, object: nil)
+            NotificationCenter.default.removeObserver(self, name: UIApplication.userDidTakeScreenshotNotification, object: nil)
         }
     }
     
@@ -78,10 +80,21 @@ public class AzboukiClient {
         options.storageBucket = storageBucket
         options.databaseURL = databaseURL
         
+
         FirebaseApp.configure(name: "MRLiveSupport", options: options)
+//        FirebaseApp.configure(options: options)
+        if let app = FirebaseApp.app(name: "MRLiveSupport") {
+            Auth.auth(app: app).signInAnonymously { result, error in
+                guard error == nil else {
+                    print("Failed to authenticate Azbouki")
+                    return
+                }
+                
+            }
+        }
     }
 
-    public class func startVideoSession(message: String?) {
+    public class func startVideoSession(message: String?, completion: @escaping (Error?) -> Void) {
         
         if AzboukiClient.shared.isCurrentlyRecording {
             print("Recording already started")
@@ -90,8 +103,15 @@ public class AzboukiClient {
         AzboukiClient.shared.openConsolePipe()
         AzboukiClient.shared.attachSentry()
         AzboukiClient.shared.currentSessionID = "\(Int(Date().timeIntervalSince1970*1000))"
-        AzboukiClient.shared.startRecordSession()
-        AzboukiClient.setCurrentSessionMessage(message: message)
+        AzboukiClient.shared.startRecordSession { err in
+            if err == nil {
+                AzboukiClient.setCurrentSessionMessage(message: message)
+                completion(nil)
+            } else {
+                completion(err)
+            }
+        }
+        
     }
     
     public static func setCurrentSessionMessage(message: String?) {
@@ -221,7 +241,7 @@ public class AzboukiClient {
         
     }
     
-    @objc public func startRecordSession() {
+    @objc public func startRecordSession(completion: @escaping (Error?) -> Void) {
         Session.start()
         
         let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -238,6 +258,7 @@ public class AzboukiClient {
         
         screenRecorder.startRecording(to: videoURL, size: nil, saveToCameraRoll: false) { err in
             print(err)
+            completion(err)
         }
         screenRecorder.delegate = self
     }

@@ -16,7 +16,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        AzboukiClient.configure(appId: "N30ahj0Yvo967gL5wHkT", userId: "teodor@azbouki.com")
+        
     }
 
     @IBAction func start(_ sender: UIButton) {
@@ -37,12 +37,19 @@ class ViewController: UIViewController {
 
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (_) in
             let textField = alert?.textFields![0]
-            AzboukiClient.startVideoSession(message: textField?.text)
-            if (AzboukiClient.isRecording()) {
-                self.toggleRecordingButton.setTitle("stop recording", for: .normal)
-            } else {
-                print("Error starting session")
+            AzboukiClient.startVideoSession(message: textField?.text) { err in
+                if let err = err {
+                    print("Error starting session: \(err.localizedDescription)")
+                    return
+                }
+                if (AzboukiClient.isRecording()) {
+                    self.toggleRecordingButton.setTitle("stop recording", for: .normal)
+                } else {
+                    print("Error starting session")
+                }
+                
             }
+            
         }))
 
         self.present(alert, animated: true, completion: nil)
@@ -65,6 +72,10 @@ class ViewController: UIViewController {
         }))
 
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    @IBAction func logButtonPressed(_ sender: Any) {
+        print("Log button pressed")
     }
 }
 

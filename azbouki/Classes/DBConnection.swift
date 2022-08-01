@@ -47,7 +47,7 @@ class DBConnection {
         
         //TODO: use codable class
         
-        return firestoreDB.collection("applications").document(AzboukiClientConfig.instance.appId).collection("screenshots").addDocument(data: ["createdAt": Date().timeIntervalSince1970*1000, "tree": tree.asJsonString(), "message": message, "userId": AzboukiClientConfig.instance.userId!, "deviceModel": UIDevice.current.model, "os": UIDevice.current.systemName, "osVersion": UIDevice.current.systemVersion, "batteryLevel": UIDevice.current.batteryLevel], completion: { error in
+        return firestoreDB.collection("applications").document(AzboukiClientConfig.instance.appId).collection("screenshots").addDocument(data: ["createdAt": Date().timeIntervalSince1970*1000, "tree": tree.asJsonString(), "message": message, "userId": AzboukiClientConfig.instance.userId!, "deviceModel": UIDevice.current.model, "os": UIDevice.current.systemName, "osVersion": UIDevice.current.systemVersion, "batteryLevel": UIDevice.current.batteryLevel, "isDeleted": false, "reportType": "3D", "appId": AzboukiClientConfig.instance.appId], completion: { error in
             print(error as Any)
         })
         

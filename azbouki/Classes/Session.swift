@@ -15,7 +15,7 @@ class Session: Codable {
     enum CodingKeys: String, CodingKey {
         case videoUrl
         case logUrl
-        case startTime
+        case createdAt
         case videoStartTime
         case videoEndTime
         case videoPath
@@ -27,11 +27,13 @@ class Session: Codable {
         case appId
         case sentryEvent
         case userId
+        case reportType
+        case message
     }
     
     var videoUrl: String?
     var logUrl: String?
-    let startTime: Int?
+    let createdAt: Int?
     var videoStartTime: Int?
     var videoEndTime: Int?
     var videoPath: String?
@@ -45,9 +47,10 @@ class Session: Codable {
     var sentryEvent: String?
     var userId: String?
     var message: String?
+    let reportType = "video"
     
     init() {
-        self.startTime = Int(Date().timeIntervalSince1970*1000)
+        self.createdAt = Int(Date().timeIntervalSince1970*1000)
         self.deviceModel = UIDevice.current.model
         self.os = UIDevice.current.systemName
         self.osVersion = UIDevice.current.systemVersion

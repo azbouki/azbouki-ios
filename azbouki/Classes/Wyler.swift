@@ -44,7 +44,7 @@ final public class ScreenRecorder {
   public func startRecording(to outputURL: URL? = nil,
                              size: CGSize? = nil,
                              saveToCameraRoll: Bool = false,
-                             errorHandler: @escaping (Error) -> Void) {
+                             errorHandler: @escaping (Error?) -> Void) {
     createVideoWriter(in: outputURL, error: errorHandler)
     addVideoWriterInput(size: size)
     self.micAudioWriterInput = createAndAddAudioInput()
@@ -114,8 +114,8 @@ final public class ScreenRecorder {
     return audioInput
   }
 
-  private func startCapture(error: @escaping (Error) -> Void) {
-      recorder.startCapture(handler: { (sampleBuffer, sampleType, passedError) in
+  private func startCapture(error: @escaping (Error?) -> Void) {
+      recorder.startCapture(handler: {[weak self] (sampleBuffer, sampleType, passedError) in
           if let passedError = passedError {
             error(passedError)
             return
@@ -123,16 +123,19 @@ final public class ScreenRecorder {
           
           switch sampleType {
           case .video:
-            self.handleSampleBuffer(sampleBuffer: sampleBuffer)
+            self?.handleSampleBuffer(sampleBuffer: sampleBuffer)
           case .audioApp:
-            self.add(sample: sampleBuffer, to: self.appAudioWriterInput)
+            self?.add(sample: sampleBuffer, to: self?.appAudioWriterInput)
           case .audioMic:
-            self.add(sample: sampleBuffer, to: self.micAudioWriterInput)
+            self?.add(sample: sampleBuffer, to: self?.micAudioWriterInput)
           default:
             break
           }
-      }) { error in
-          print(error)
+      }) { [weak self] err in
+          if err == nil {
+              self?.delegate?.recordingDidStart()
+          }
+          error(err)
       }
 //    recorder.startCapture(handler: { (sampleBuffer, sampleType, passedError) in
 //      if let passedError = passedError {
@@ -156,7 +159,6 @@ final public class ScreenRecorder {
   private func handleSampleBuffer(sampleBuffer: CMSampleBuffer) {
     if self.videoWriter?.status == AVAssetWriter.Status.unknown {
       self.videoWriter?.startWriting()
-        delegate?.recordingDidStart()
       self.videoWriter?.startSession(atSourceTime: CMSampleBufferGetPresentationTimeStamp(sampleBuffer))
     } else if self.videoWriter?.status == AVAssetWriter.Status.writing &&
       self.videoWriterInput?.isReadyForMoreMediaData == true {

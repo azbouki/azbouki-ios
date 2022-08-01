@@ -214,6 +214,7 @@ PODS:
     - abseil/meta/type_traits
   - azbouki (0.1.0):
     - Firebase
+    - Firebase/Auth
     - Firebase/Database
     - Firebase/Firestore
     - Firebase/Storage
@@ -227,6 +228,9 @@ PODS:
   - BoringSSL-GRPC/Interface (0.0.7)
   - Firebase (6.34.0):
     - Firebase/Core (= 6.34.0)
+  - Firebase/Auth (6.34.0):
+    - Firebase/CoreOnly
+    - FirebaseAuth (~> 6.9.2)
   - Firebase/Core (6.34.0):
     - Firebase/CoreOnly
     - FirebaseAnalytics (= 6.9.0)
@@ -250,6 +254,11 @@ PODS:
     - GoogleUtilities/Network (~> 6.7)
     - "GoogleUtilities/NSData+zlib (~> 6.7)"
     - nanopb (~> 1.30906.0)
+  - FirebaseAuth (6.9.2):
+    - FirebaseCore (~> 6.10)
+    - GoogleUtilities/AppDelegateSwizzler (~> 6.7)
+    - GoogleUtilities/Environment (~> 6.7)
+    - GTMSessionFetcher/Core (~> 1.1)
   - FirebaseCore (6.10.4):
     - FirebaseCoreDiagnostics (~> 1.6)
     - GoogleUtilities/Environment (~> 6.7)
@@ -360,6 +369,7 @@ SPEC REPOS:
     - BoringSSL-GRPC
     - Firebase
     - FirebaseAnalytics
+    - FirebaseAuth
     - FirebaseCore
     - FirebaseCoreDiagnostics
     - FirebaseDatabase
@@ -386,10 +396,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
-  azbouki: 7050fe07d6efc1c61cfd2048fedab3c3005be2af
+  azbouki: e35de2d49173d7ec0748999fbf0eac5afa2a84a6
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
   Firebase: c23a36d9e4cdf7877dfcba8dd0c58add66358999
   FirebaseAnalytics: 3bb096873ee0d7fa4b6c70f5e9166b6da413cc7f
+  FirebaseAuth: c92d49ada7948d1a23466e3db17bc4c2039dddc3
   FirebaseCore: d3a978a3cfa3240bf7e4ba7d137fdf5b22b628ec
   FirebaseCoreDiagnostics: 770ac5958e1372ce67959ae4b4f31d8e127c3ac1
   FirebaseDatabase: 13a865a4b85897462b930eb683bda8f52583713f
@@ -412,4 +423,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 792b7fabb7b2566c6fcd058012a1bf7e7bd28ffa
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3

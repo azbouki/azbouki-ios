@@ -42,6 +42,7 @@ TODO: Add long description of the pod here.
   
   s.static_framework = true
   s.dependency 'Firebase'#, '~> 8.10.0'
+  s.dependency 'Firebase/Auth'
   s.dependency 'Firebase/Database'
   s.dependency 'Firebase/Storage'
   s.dependency 'Firebase/Firestore'
