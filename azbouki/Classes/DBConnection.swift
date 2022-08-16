@@ -19,14 +19,14 @@ class DBConnection {
     var sessionID: String!
     
     init(sessionID: String) {
-        guard let app = FirebaseApp.app(name: "MRLiveSupport")
+        guard let app = FirebaseApp.app(name: "SupportTool")
           else {
               assert(false, "Could not retrieve app")
               return
           }
         
         self.sessionID = sessionID
-        storageRef = Storage.storage(app: app).reference().child(AzboukiClientConfig.instance.appId).child("sessions").child(sessionID)
+        storageRef = Storage.storage(app: app).reference().child("teams").child(AzboukiClientConfig.instance.teamId).child("applications").child(AzboukiClientConfig.instance.appId).child("sessions").child(sessionID)
         firestoreDB = Firestore.firestore(app: app)
     }
     
@@ -40,14 +40,14 @@ class DBConnection {
         session.videoUrl = videoURL
         session.logUrl = logFileURL
 
-        try? firestoreDB.collection("applications").document(AzboukiClientConfig.instance.appId).collection("sessions").addDocument(from: session)
+        try? firestoreDB.collection("teams").document(AzboukiClientConfig.instance.teamId).collection("applications").document(AzboukiClientConfig.instance.appId).collection("sessions").document(session.id).setData(from: session)
     }
     
     func uploadViewTree(tree: ViewTree, message: String) -> DocumentReference? {
         
         //TODO: use codable class
         
-        return firestoreDB.collection("applications").document(AzboukiClientConfig.instance.appId).collection("screenshots").addDocument(data: ["createdAt": Date().timeIntervalSince1970*1000, "tree": tree.asJsonString(), "message": message, "userId": AzboukiClientConfig.instance.userId!, "deviceModel": UIDevice.current.model, "os": UIDevice.current.systemName, "osVersion": UIDevice.current.systemVersion, "batteryLevel": UIDevice.current.batteryLevel, "isDeleted": false, "reportType": "3D", "appId": AzboukiClientConfig.instance.appId], completion: { error in
+        return firestoreDB.collection("teams").document(AzboukiClientConfig.instance.teamId).collection("applications").document(AzboukiClientConfig.instance.appId).collection("screenshots").addDocument(data: ["createdAt": Date().timeIntervalSince1970*1000, "tree": tree.asJsonString(), "message": message, "userId": AzboukiClientConfig.instance.userId!, "deviceModel": UIDevice.current.model, "os": UIDevice.current.systemName, "osVersion": UIDevice.current.systemVersion, "batteryLevel": UIDevice.current.batteryLevel, "isDeleted": false, "reportType": "3D", "appId": AzboukiClientConfig.instance.appId], completion: { error in
             print(error as Any)
         })
         
@@ -106,6 +106,16 @@ class DBConnection {
         uploadFile(ref: videoRef, url: url) { url in
             completion(url)
         }
+    }
+    
+    class func getNewSessionId() -> String {
+        guard let app = FirebaseApp.app(name: "SupportTool")
+          else {
+              assert(false, "Could not retrieve app")
+              return ""
+          }
+        let refer = Firestore.firestore(app: app).collection("teams").document(AzboukiClientConfig.instance.teamId).collection("applications").document(AzboukiClientConfig.instance.appId).collection("sessions").document()
+        return refer.documentID
     }
 
 }

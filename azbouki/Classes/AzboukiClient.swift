@@ -14,7 +14,6 @@ import FirebaseAuth
 public class AzboukiClient {
     
     public static let shared = AzboukiClient()
-    var currentSessionID = "\(Int(Date().timeIntervalSince1970*1000))"
     var dbConnection: DBConnection?
     var inputPipe: Pipe?
     var outputPipe: Pipe?
@@ -22,7 +21,6 @@ public class AzboukiClient {
     var currentSessionPathURL: URL?
     
     var newLogFileURL: URL?
-    var newShotsPathURL: URL?
     var sessionsPathURL: URL?
     
     var saved_stdout: Int32?
@@ -35,8 +33,16 @@ public class AzboukiClient {
     var currentSessionLogPathURL: URL?
     public weak var delegate: RPPreviewViewControllerDelegate?
     
-    public static func configure(appId: String, userId: String?) {
-        shared.configure(appId: appId, userId: userId, googleAppID: Constants.GOOGLE_APP_ID, gcmSenderID: Constants.GCM_SENDER_ID, apiKey: Constants.FB_API_KEY, projectID: Constants.FB_PROJECT_ID, clientID: Constants.FB_CLIENT_ID, storageBucket: Constants.FB_STORAGE_BUCKET, databaseURL: Constants.DATABASE_URL)
+    public static func configure(appId: String, userId: String) {
+             
+        guard let queryStr = appId.fromBase64(),
+        let url = URL(string: "https://azbouki.com?\(queryStr)"),
+        let appId = url["appId"],
+        let teamId = url["teamId"] else {
+            print("Invalid azbouki key")
+            return;
+        }
+        shared.configure(appId: appId, userId: userId, teamId: teamId, googleAppID: Constants.GOOGLE_APP_ID, gcmSenderID: Constants.GCM_SENDER_ID, apiKey: Constants.FB_API_KEY, projectID: Constants.FB_PROJECT_ID, clientID: Constants.FB_CLIENT_ID, storageBucket: Constants.FB_STORAGE_BUCKET, databaseURL: Constants.DATABASE_URL)
         
     }
     
@@ -60,11 +66,12 @@ public class AzboukiClient {
         }
     }
     
-    func configure(appId: String, userId: String?, googleAppID: String, gcmSenderID: String, apiKey: String, projectID: String, clientID: String, storageBucket: String, databaseURL: String) {
+    func configure(appId: String, userId: String?, teamId: String, googleAppID: String, gcmSenderID: String, apiKey: String, projectID: String, clientID: String, storageBucket: String, databaseURL: String) {
         AzboukiClientConfig.instance.appId = appId
         AzboukiClientConfig.instance.userId = userId
+        AzboukiClientConfig.instance.teamId = teamId
     configureFirebase(googleAppID: googleAppID, gcmSenderID: gcmSenderID, apiKey: apiKey, projectID: projectID, clientID: clientID, storageBucket: storageBucket, databaseURL: databaseURL)
-        createFoldersAndPaths()
+        
     }
     
     func setUserId(userId: String?) {
@@ -78,12 +85,12 @@ public class AzboukiClient {
         options.projectID = projectID
         options.clientID = clientID
         options.storageBucket = storageBucket
-        options.databaseURL = databaseURL
+//        options.databaseURL = databaseURL
         
 
-        FirebaseApp.configure(name: "MRLiveSupport", options: options)
+        FirebaseApp.configure(name: "SupportTool", options: options)
 //        FirebaseApp.configure(options: options)
-        if let app = FirebaseApp.app(name: "MRLiveSupport") {
+        if let app = FirebaseApp.app(name: "SupportTool") {
             Auth.auth(app: app).signInAnonymously { result, error in
                 guard error == nil else {
                     print("Failed to authenticate Azbouki")
@@ -102,9 +109,9 @@ public class AzboukiClient {
         }
         AzboukiClient.shared.openConsolePipe()
         AzboukiClient.shared.attachSentry()
-        AzboukiClient.shared.currentSessionID = "\(Int(Date().timeIntervalSince1970*1000))"
         AzboukiClient.shared.startRecordSession { err in
             if err == nil {
+                AzboukiClient.shared.createFoldersAndPaths(currentSessionID: Session.current!.id)
                 AzboukiClient.setCurrentSessionMessage(message: message)
                 completion(nil)
             } else {
@@ -172,6 +179,11 @@ public class AzboukiClient {
     }
     
     func handleVideoReport() {
+        
+        guard let currentSessionID = Session.current?.id else {
+            return
+        }
+
 
         dbConnection = DBConnection(sessionID: currentSessionID)
         do {
@@ -256,7 +268,7 @@ public class AzboukiClient {
             return
         }
         
-        screenRecorder.startRecording(to: videoURL, size: nil, saveToCameraRoll: false) { err in
+         screenRecorder.startRecording(to: videoURL, size: nil, saveToCameraRoll: false) { err in
             print(err)
             completion(err)
         }
@@ -323,7 +335,7 @@ extension AzboukiClient: ScreenRecorderDelegate {
         }
     }
     
-    func createFoldersAndPaths() {
+    func createFoldersAndPaths(currentSessionID: String) {
         let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         
         sessionsPathURL = path.appendingPathComponent("sessions")
@@ -340,10 +352,5 @@ extension AzboukiClient: ScreenRecorderDelegate {
         try? FileManager.default.createDirectory(atPath: currentSessionPathURL!.path, withIntermediateDirectories: true, attributes: nil)
         
         self.newLogFileURL = currentSessionPathURL!.appendingPathComponent("logs.txt")
-        
-        self.newShotsPathURL = currentSessionPathURL!.appendingPathComponent("screenshots")
-        
-        
-        try? FileManager.default.createDirectory(atPath: newShotsPathURL!.path, withIntermediateDirectories: true, attributes: nil)
     }
 }

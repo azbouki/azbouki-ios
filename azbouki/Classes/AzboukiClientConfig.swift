@@ -13,5 +13,6 @@ public class AzboukiClientConfig {
     
     var appId: String!
     var userId: String?
+    var teamId: String!
 
 }

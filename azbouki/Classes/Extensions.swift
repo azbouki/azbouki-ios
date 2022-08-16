@@ -17,6 +17,29 @@ extension String {
      }
  }
 
+extension String {
+
+    func fromBase64() -> String? {
+        guard let data = Data(base64Encoded: self) else {
+            return nil
+        }
+
+        return String(data: data, encoding: .utf8)
+    }
+
+    func toBase64() -> String {
+        return Data(self.utf8).base64EncodedString()
+    }
+
+}
+
+extension URL {
+    subscript(queryParam:String) -> String? {
+        guard let url = URLComponents(string: self.absoluteString) else { return nil }
+        return url.queryItems?.first(where: { $0.name == queryParam })?.value
+    }
+}
+
  extension Data {
      func append(fileURL: URL) throws {
          if let fileHandle = FileHandle(forWritingAtPath: fileURL.path) {

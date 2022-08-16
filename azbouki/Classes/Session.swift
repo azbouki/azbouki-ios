@@ -13,6 +13,7 @@ class Session: Codable {
     static var current: Session?
     
     enum CodingKeys: String, CodingKey {
+        case id
         case videoUrl
         case logUrl
         case createdAt
@@ -31,6 +32,7 @@ class Session: Codable {
         case message
     }
     
+    var id: String
     var videoUrl: String?
     var logUrl: String?
     let createdAt: Int?
@@ -57,6 +59,7 @@ class Session: Codable {
         self.batteryLevel = UIDevice.current.batteryLevel
         self.appId = AzboukiClientConfig.instance.appId
         self.userId = AzboukiClientConfig.instance.userId
+        self.id = DBConnection.getNewSessionId()
     }
     
     static func start() {
@@ -66,8 +69,8 @@ class Session: Codable {
         }
         
         Session.current = Session()
-        Session.current?.videoPath = "session-\(Date().timeIntervalSince1970 * 1000000).mp4"
-        Session.current?.logPath = "session-\(Date().timeIntervalSince1970 * 1000000).txt"
+        Session.current?.videoPath = "\(Session.current!.id).mp4"
+        Session.current?.logPath = "\(Session.current!.id).txt"
     }
     
     static func stop() {
