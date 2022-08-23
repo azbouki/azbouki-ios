@@ -42,7 +42,7 @@ public class AzboukiClient {
             print("Invalid azbouki key")
             return;
         }
-        shared.configure(appId: appId, userId: userId, teamId: teamId, googleAppID: Constants.GOOGLE_APP_ID, gcmSenderID: Constants.GCM_SENDER_ID, apiKey: Constants.FB_API_KEY, projectID: Constants.FB_PROJECT_ID, clientID: Constants.FB_CLIENT_ID, storageBucket: Constants.FB_STORAGE_BUCKET, databaseURL: Constants.DATABASE_URL)
+        shared.configure(appId: appId, userId: userId, teamId: teamId, googleAppID: Constants.GOOGLE_APP_ID, gcmSenderID: Constants.GCM_SENDER_ID, apiKey: Constants.FB_API_KEY, projectID: Constants.FB_PROJECT_ID, clientID: Constants.FB_CLIENT_ID, storageBucket: Constants.FB_STORAGE_BUCKET)
         
     }
     
@@ -66,11 +66,11 @@ public class AzboukiClient {
         }
     }
     
-    func configure(appId: String, userId: String?, teamId: String, googleAppID: String, gcmSenderID: String, apiKey: String, projectID: String, clientID: String, storageBucket: String, databaseURL: String) {
+    func configure(appId: String, userId: String?, teamId: String, googleAppID: String, gcmSenderID: String, apiKey: String, projectID: String, clientID: String, storageBucket: String) {
         AzboukiClientConfig.instance.appId = appId
         AzboukiClientConfig.instance.userId = userId
         AzboukiClientConfig.instance.teamId = teamId
-    configureFirebase(googleAppID: googleAppID, gcmSenderID: gcmSenderID, apiKey: apiKey, projectID: projectID, clientID: clientID, storageBucket: storageBucket, databaseURL: databaseURL)
+    configureFirebase(googleAppID: googleAppID, gcmSenderID: gcmSenderID, apiKey: apiKey, projectID: projectID, clientID: clientID, storageBucket: storageBucket)
         
     }
     
@@ -78,18 +78,16 @@ public class AzboukiClient {
         AzboukiClientConfig.instance.userId = userId
     }
     
-    func configureFirebase(googleAppID: String, gcmSenderID: String, apiKey: String, projectID: String, clientID: String, storageBucket: String, databaseURL: String) {
+    func configureFirebase(googleAppID: String, gcmSenderID: String, apiKey: String, projectID: String, clientID: String, storageBucket: String) {
         let options = FirebaseOptions(googleAppID: googleAppID,
                                                gcmSenderID: gcmSenderID)
         options.apiKey = apiKey
         options.projectID = projectID
         options.clientID = clientID
         options.storageBucket = storageBucket
-//        options.databaseURL = databaseURL
         
 
         FirebaseApp.configure(name: "SupportTool", options: options)
-//        FirebaseApp.configure(options: options)
         if let app = FirebaseApp.app(name: "SupportTool") {
             Auth.auth(app: app).signInAnonymously { result, error in
                 guard error == nil else {

@@ -21,11 +21,11 @@ Pod::Spec.new do |s|
 Open-source troubleshooting SDK
                        DESC
 
-  s.homepage         = 'https://github.com/tdermendjiev/azbouki'
+  s.homepage         = 'https://github.com/azbouki/azbouki-ios'
   s.screenshots     = 'https://www.azbouki.com/assets/img/screenshot-layout2.jpg'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'tdermendjiev' => 'tdermendjievft@gmail.com' }
-  s.source           = { :git => 'https://github.com/tdermendjiev/azbouki.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/azbouki/azbouki-ios.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/azbouki'
 
   s.ios.deployment_target = '11.0'
