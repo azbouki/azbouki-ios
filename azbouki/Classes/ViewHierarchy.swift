@@ -193,7 +193,7 @@ public class ViewHierarchy {
     }
     
     static func saveImage(image: UIImage, name: String) -> ViewImageRef? {
-        guard let data = image.pngData() else {
+        guard let data = UIImagePNGRepresentation(image) else {
             return nil
         }
         guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) as NSURL else {

@@ -29,6 +29,7 @@ Open-source troubleshooting SDK
   s.social_media_url = 'https://twitter.com/azbouki'
 
   s.ios.deployment_target = '11.0'
+  s.swift_version = '5.6.1'
 
   s.source_files = 'azbouki/Classes/**/*'
   
