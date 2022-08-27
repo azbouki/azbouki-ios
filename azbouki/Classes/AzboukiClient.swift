@@ -49,7 +49,7 @@ public class AzboukiClient {
     public func setScreenshotHandlerEnabled(_ enabled: Bool, message: String) {
         if (enabled) {
             NotificationCenter.default.addObserver(
-                forName: NSNotification.Name.UIApplicationUserDidTakeScreenshot,
+                forName: UIApplication.userDidTakeScreenshotNotification,
                 object: nil,
                 queue: .main) { notification in
                     if var topController = UIApplication.shared.keyWindow?.rootViewController {
@@ -62,7 +62,7 @@ public class AzboukiClient {
                     
             }
         } else {
-            NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIApplicationUserDidTakeScreenshot, object: nil)
+            NotificationCenter.default.removeObserver(self, name: UIApplication.userDidTakeScreenshotNotification, object: nil)
         }
     }
     
