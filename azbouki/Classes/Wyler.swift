@@ -137,23 +137,6 @@ final public class ScreenRecorder {
           }
           error(err)
       }
-//    recorder.startCapture(handler: { (sampleBuffer, sampleType, passedError) in
-//      if let passedError = passedError {
-//        error(passedError)
-//        return
-//      }
-//
-//      switch sampleType {
-//      case .video:
-//        self.handleSampleBuffer(sampleBuffer: sampleBuffer)
-//      case .audioApp:
-//        self.add(sample: sampleBuffer, to: self.appAudioWriterInput)
-//      case .audioMic:
-//        self.add(sample: sampleBuffer, to: self.micAudioWriterInput)
-//      default:
-//        break
-//      }
-//    })
   }
 
   private func handleSampleBuffer(sampleBuffer: CMSampleBuffer) {

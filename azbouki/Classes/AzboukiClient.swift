@@ -182,7 +182,6 @@ public class AzboukiClient {
             return
         }
 
-
         dbConnection = DBConnection(sessionID: currentSessionID)
         do {
             let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
